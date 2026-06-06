@@ -1,0 +1,186 @@
+import Link from "next/link";
+import { ArrowUpRight, ArrowRight } from "lucide-react";
+import { Reveal } from "@/components/expertise/shared/Reveal";
+import { ToolsMarquee } from "@/components/expertise/shared/ToolsMarquee";
+import ExpertiseHero from "@/components/expertise/ExpertiseHero";
+import GrainBlobs from "@/components/shared/GrainBlobs";
+import { segments } from "./data";
+import { BrandImageCollage } from "@/components/expertise/BrandImageCollage";
+import { BuildImageCollage } from "@/components/expertise/BuildImageCollage";
+import { GrowthImageCollage } from "@/components/expertise/GrowthImageCollage";
+import { TrustImageCollage } from "@/components/expertise/TrustImageCollage";
+
+export const metadata = {
+  title: "Expertise — APSLOCK",
+  description:
+    "Four core capabilities: Brand Foundations, Build & Innovation, Growth & GTM, and Trust & Influence. Integrated to support operational stability and commercial growth.",
+  alternates: {
+    canonical: "https://apslock.com/expertise",
+  },
+};
+
+export default function ExpertisePage() {
+  return (
+    <main className="flex-1 bg-[#F3F1ED] expertise-page relative">
+      <GrainBlobs variant="amber" intensity={0.12} animate={true} className="fixed inset-0 z-0 pointer-events-none" />
+
+      {/* Hero */}
+      <ExpertiseHero />
+
+      {/* Tools band */}
+      <div className="relative z-10 bg-[#F3F1ED]">
+        <ToolsMarquee />
+      </div>
+
+      {/* Segments */}
+      <section className="relative z-10 bg-[#F3F1ED] overflow-hidden">
+        {segments.map((seg, idx) => {
+          const isEven = idx % 2 === 0;
+
+          return (
+            <article
+              key={seg.id}
+              className={`relative py-20 md:py-28 lg:py-40 border-b border-[#1A1625]/10 last:border-b-0 ${
+                seg.id === "brand-foundations" ? "overflow-visible" : "overflow-hidden"
+              }`}
+            >
+              {/* Background numeral watermark */}
+              <div
+                className={`absolute top-1/2 -translate-y-1/2 pointer-events-none opacity-[0.03] select-none z-0 ${isEven ? "right-0 translate-x-[15%]" : "left-0 -translate-x-[15%]"
+                  }`}
+              >
+                <span className="text-[40vw] sm:text-[35vw] md:text-[30vw] font-display font-bold leading-none tracking-tighter text-[#1A1625]">
+                  {seg.number}
+                </span>
+              </div>
+
+              <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 relative z-10">
+                <div
+                  className={`flex flex-col lg:flex-row gap-12 lg:gap-24 items-center ${!isEven ? "lg:flex-row-reverse" : ""
+                    }`}
+                >
+                  {/* Image Side */}
+                  <div className="w-full lg:w-1/2">
+                    {seg.id === "brand-foundations" ? (
+                      <div className="w-full overflow-visible pr-5 md:pr-6">
+                        <BrandImageCollage />
+                      </div>
+                    ) : seg.id === "trust-influence" ? (
+                      <div className="w-full overflow-visible">
+                        <TrustImageCollage />
+                      </div>
+                    ) : seg.id === "growth-go-to-market" ? (
+                      <div className="w-full overflow-visible">
+                        <GrowthImageCollage />
+                      </div>
+                    ) : (
+                      <div className="w-full overflow-visible lg:overflow-visible">
+                        <BuildImageCollage />
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Text Side */}
+                  <div className="w-full lg:w-1/2 flex flex-col justify-center">
+                    <Reveal delay={100} duration={800} distance={20}>
+
+                      <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-display text-[#1A1625] mb-5 lg:mb-6 tracking-tight leading-[1.1]">
+                        {seg.title}
+                      </h2>
+                      <p className="font-sans text-base md:text-lg lg:text-xl text-[#6B5A7A] leading-relaxed max-w-xl mb-10 lg:mb-12">
+                        {seg.description}
+                      </p>
+                    </Reveal>
+
+                    <Reveal delay={200} duration={800} distance={20}>
+                      <ul className="grid grid-cols-1 sm:grid-cols-2 gap-x-8 gap-y-0 mb-10">
+                        {seg.tags.map((tag) => (
+                          <li
+                            key={tag}
+                            className="flex items-center gap-3 py-3 border-b border-[#1A1625]/10 last:border-0"
+                          >
+                            <svg
+                              className="w-4 h-4 text-[#5A2A6E] shrink-0"
+                              fill="none"
+                              viewBox="0 0 24 24"
+                              stroke="currentColor"
+                            >
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                            </svg>
+                            <span className="text-sm md:text-base text-[#1A1625] font-medium leading-tight">
+                              {tag}
+                            </span>
+                          </li>
+                        ))}
+                      </ul>
+                    </Reveal>
+
+                    <Reveal delay={300} duration={800} distance={20}>
+                      <Link
+                        href={seg.href}
+                        className="group inline-flex items-center gap-2 text-[15px] font-semibold text-[#1A1625] underline underline-offset-[6px] decoration-[1.5px] decoration-[#1A1625] hover:text-[#5A2A6E] hover:decoration-[#5A2A6E] transition-colors w-fit"
+                      >
+                        Learn more
+                        <ArrowUpRight
+                          className="h-4 w-4 transition-transform duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+                          strokeWidth={2}
+                        />
+                      </Link>
+                    </Reveal>
+                  </div>
+                </div>
+              </div>
+            </article>
+          );
+        })}
+      </section>
+
+      {/* Bottom CTA mini-block */}
+      <section className="relative z-10 mx-auto max-w-6xl px-4 sm:px-6 lg:px-8 pt-20 pb-28 bg-[#F3F1ED]">
+        <Reveal duration={1000} distance={48} scale={0.98}>
+          <div
+            className="relative overflow-hidden rounded-3xl p-8 sm:p-12 lg:p-16"
+            style={{
+              background:
+                "radial-gradient(ellipse 70% 50% at 85% 10%, rgba(245,237,238,0.06) 0%, transparent 55%), " +
+                "radial-gradient(ellipse 55% 45% at 10% 80%, rgba(238,242,237,0.04) 0%, transparent 55%), " +
+                "#141210",
+            }}
+          >
+            <div className="relative grid grid-cols-1 lg:grid-cols-[1fr_auto] gap-8 items-end">
+              <div className="max-w-2xl">
+                <Reveal delay={120} duration={800} distance={24}>
+                  <span className="inline-block text-xs font-bold tracking-[0.18em] uppercase text-[#A58BC0]">
+                    Where it all meets
+                  </span>
+                </Reveal>
+                <Reveal delay={240} duration={950} distance={0}>
+                  <h3 className="font-display uppercase mt-4"
+                    style={{ fontSize: "clamp(22px, 3vw, 32px)", fontWeight: 700, letterSpacing: "0.06em", lineHeight: 1.15, color: "#FFFFFF" }}>
+                    Brand &amp; Experience
+                  </h3>
+                </Reveal>
+                <Reveal delay={360} duration={900} distance={28}>
+                  <p className="mt-4 text-base sm:text-lg text-[#C8BDD4] leading-relaxed">
+                    The place where identity meets interface. Our integrated teams pair brand systems
+                    with UX and engineering — so what your customers see, use, and remember all feel
+                    like the same product. One idea, every touchpoint.
+                  </p>
+                </Reveal>
+              </div>
+              <Reveal delay={500} duration={800} distance={24}>
+                <Link
+                  href="/expertise/brand-foundations"
+                  className="group inline-flex items-center gap-2 rounded-full bg-[#FDFDFC] px-6 py-3.5 text-[15px] font-semibold text-[#1A1625] transition-colors hover:bg-[#F3F1ED] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white focus-visible:ring-offset-4 focus-visible:ring-offset-[#1A1625] w-fit"
+                >
+                  Learn more
+                  <ArrowRight className="h-4 w-4 transition-transform duration-200 group-hover:translate-x-0.5" strokeWidth={2} />
+                </Link>
+              </Reveal>
+            </div>
+          </div>
+        </Reveal>
+      </section>
+    </main>
+  );
+}

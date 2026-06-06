@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /
+
+# Disallow Sanity Studio (admin area)
+Disallow: /studio/
+
+Sitemap: https://apslock.com/sitemap.xml
