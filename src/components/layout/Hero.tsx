@@ -18,8 +18,8 @@ function HeroScene() {
 
     const lightPosition = useMemo(() => new THREE.Vector3(-1, 0.8, 0.25).normalize().multiplyScalar(5), []);
 
-    // NOTE: In a new project, ensure bnoise.png is in your public folder or update this path.
-    const noise = useTexture("/bnoise.png");
+    // Using an existing image as noise texture to avoid missing file errors
+    const noise = useTexture("/images/home/retro-tvs.png");
     useEffect(() => {
         if (noise) {
             noise.wrapS = THREE.RepeatWrapping;
