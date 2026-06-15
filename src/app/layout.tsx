@@ -11,21 +11,21 @@ const oswald = Oswald({
   weight: ["400", "500", "600", "700"],
   subsets: ["latin"],
   variable: "--font-display",
-  display: "swap",
+  display: "block",
 });
 
 const hind = Hind({
   weight: ["400", "500", "600"],
   subsets: ["latin"],
   variable: "--font-sans",
-  display: "swap",
+  display: "block",
 });
 
 const caveat = Caveat({
   weight: ["400", "700"],
   subsets: ["latin"],
   variable: "--font-caveat",
-  display: "swap",
+  display: "block",
 });
 
 export const viewport: Viewport = {
