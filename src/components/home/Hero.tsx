@@ -49,82 +49,15 @@ export default function Hero({ content }: HeroProps) {
       canvas.width = W;
       canvas.height = H;
 
-      // --- Step 1: Process image on an offscreen canvas ---
-      const offscreen = document.createElement("canvas");
-      offscreen.width = W;
-      offscreen.height = H;
-      const offCtx = offscreen.getContext("2d", { willReadFrequently: true })!;
-      offCtx.drawImage(img, 0, 0);
-
-      const imageData = offCtx.getImageData(0, 0, W, H);
-      const d = imageData.data;
-
-      // Y-zone boundaries (percentage of image height)
-      const zoneCuts = [0, 0.4, 0.7, 1.0];
-
-      // Bounding boxes per zone: [minX, minY, maxX, maxY]
-      const bboxes: [number, number, number, number][] = [
-        [W, H, 0, 0],
-        [W, H, 0, 0],
-        [W, H, 0, 0],
+      // Pre-calculated bounding boxes for the 3 TVs
+      const bounds = [
+        { x: 356, y: 87, w: 245, h: 191 },
+        { x: 355, y: 445, w: 247, h: 194 },
+        { x: 353, y: 721, w: 249, h: 197 },
       ];
 
-      for (let i = 0; i < d.length; i += 4) {
-        const r = d[i];
-        const g = d[i + 1];
-        const b = d[i + 2];
-
-        const pixelIndex = i / 4;
-        const px = pixelIndex % W;
-        const py = (pixelIndex - px) / W;
-
-        // Detect off-white / beige background pixels
-        const maxC = Math.max(r, g, b);
-        const minC = Math.min(r, g, b);
-        const saturation = maxC === 0 ? 0 : (maxC - minC) / maxC;
-        const brightness = (r + g + b) / 3;
-
-        if (brightness > 190 && saturation < 0.12) {
-          d[i + 3] = 0;
-          continue;
-        }
-
-        // Detect chroma-green pixels
-        const isGreen = g > 80 && g > r * 1.35 && g > b * 1.35;
-        if (isGreen) {
-          d[i + 3] = 0;
-
-          // Determine which TV zone this pixel belongs to
-          const yPct = py / H;
-          let zone = -1;
-          for (let z = 0; z < 3; z++) {
-            if (yPct >= zoneCuts[z] && yPct < zoneCuts[z + 1]) {
-              zone = z;
-              break;
-            }
-          }
-          if (zone >= 0) {
-            const bb = bboxes[zone];
-            if (px < bb[0]) bb[0] = px;
-            if (py < bb[1]) bb[1] = py;
-            if (px > bb[2]) bb[2] = px;
-            if (py > bb[3]) bb[3] = py;
-          }
-        }
-      }
-
-      offCtx.putImageData(imageData, 0, 0);
-
-      // Create bitmap from processed image
-      const processedBitmap = await createImageBitmap(offscreen);
-
-      // Convert bounding boxes to { x, y, w, h }
-      const bounds = bboxes.map((bb) => ({
-        x: bb[0],
-        y: bb[1],
-        w: bb[2] - bb[0],
-        h: bb[3] - bb[1],
-      }));
+      // Use the pre-processed image
+      const processedBitmap = await createImageBitmap(img);
 
       // --- Step 2: Create media elements ---
       const mediaSrcs = [
@@ -234,7 +167,7 @@ export default function Hero({ content }: HeroProps) {
         animId = requestAnimationFrame(frame);
       }
     };
-    img.src = "/images/home/retro-tvs.png";
+    img.src = "/images/home/retro-tvs-processed.png";
 
     // --- Cleanup on unmount ---
     return () => {
@@ -312,7 +245,7 @@ export default function Hero({ content }: HeroProps) {
               {/* Fallback shown while canvas processes — same layout footprint, no shift */}
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src="/images/home/retro-tvs.png"
+                src="/images/home/retro-tvs-processed.png"
                 alt="Stacked retro TVs"
                 fetchPriority="high"
                 decoding="async"

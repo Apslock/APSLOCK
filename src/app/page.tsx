@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
 import Hero from "@/components/home/Hero";
-import CaseReel from "@/components/home/CaseReel";
-import AnimatedCapabilities from "@/components/home/AnimatedCapabilities";
-import BlogPreview from "@/components/home/BlogPreview";
 import GrainBlobs from "@/components/shared/GrainBlobs";
 import { heroContent, capabilities, blogPosts } from "@/lib/data";
+import dynamic from "next/dynamic";
+
+const CaseReel = dynamic(() => import("@/components/home/CaseReel"), { ssr: true });
+const AnimatedCapabilities = dynamic(() => import("@/components/home/AnimatedCapabilities"), { ssr: true });
+const BlogPreview = dynamic(() => import("@/components/home/BlogPreview"), { ssr: true });
 
 export const metadata: Metadata = {
   title: "APSLOCK — Atlanta Digital Agency | Web Design, Brand & Growth",
