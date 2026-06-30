@@ -3,7 +3,7 @@ import FadeIn from "@/components/shared/FadeIn";
 import { HighlightText } from "@/components/ui/HighlightText";
 import ValuesSection from "@/components/about/ValuesSection";
 import WorkProcess from "@/components/about/WorkProcess";
-import TeamSection from "@/components/about/TeamSection";
+
 import BigCTA from "@/components/shared/BigCTA";
 import GrainBlobs from "@/components/shared/GrainBlobs";
 import { workProcess } from "@/lib/data";
@@ -49,8 +49,6 @@ export default function AboutPage() {
       {/* Work Process */}
       <div className="relative z-10"><WorkProcess process={workProcess} /></div>
 
-      {/* Team */}
-      <div className="relative z-10"><TeamSection /></div>
 
       {/* CTA */}
       <div className="relative z-10"><BigCTA /></div>

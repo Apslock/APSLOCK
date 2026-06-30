@@ -16,6 +16,11 @@ export default function Hero({ content }: HeroProps) {
   const [ready, setReady] = useState(false);
   const [wordIndex, setWordIndex] = useState(0);
 
+  const sectionRef = useRef<HTMLElement>(null);
+  const isVisibleRef = useRef(false);
+  const isAnimatingRef = useRef(false);
+  const animationIdRef = useRef<number | null>(null);
+
   const wordColors = [
     "text-[#B85C38]", // Terracotta (notice)
     "text-[#2A9D8F]", // Deep Teal (trust)
@@ -36,10 +41,9 @@ export default function Hero({ content }: HeroProps) {
     if (!maybeCtx) return;
     const ctx = maybeCtx;
 
-    let animId = 0;
-    const videos: HTMLVideoElement[] = [];
-    // Hoisted so the cleanup return can reach it regardless of whether onload fired
     let mediaElements: (HTMLVideoElement | HTMLImageElement)[] = [];
+    let startAnimation: () => void = () => {};
+    let stopAnimation: () => void = () => {};
 
     const img = document.createElement("img");
     img.crossOrigin = "anonymous";
@@ -139,11 +143,18 @@ export default function Hero({ content }: HeroProps) {
       const checkReady = () => {
         readyCount++;
         if (readyCount === 3) {
-          mediaElements.forEach((m) => {
-            if (m instanceof HTMLVideoElement) m.play().catch(e => console.error("Video play failed:", e));
-          });
           setReady(true);
-          startLoop();
+          if (sectionRef.current) {
+            const rect = sectionRef.current.getBoundingClientRect();
+            isVisibleRef.current = rect.top < window.innerHeight && rect.bottom > 0;
+          }
+          if (isVisibleRef.current) {
+            startAnimation();
+          } else {
+            mediaElements.forEach((m) => {
+              if (m instanceof HTMLVideoElement) m.pause();
+            });
+          }
         }
       };
 
@@ -167,10 +178,20 @@ export default function Hero({ content }: HeroProps) {
         }
       });
 
-      // --- Step 3: requestAnimationFrame render loop ---
-      function startLoop() {
+      // --- Step 3: requestAnimationFrame render loop controller functions ---
+      startAnimation = () => {
+        if (isAnimatingRef.current || !isVisibleRef.current) return;
+        isAnimatingRef.current = true;
+
+        mediaElements.forEach((m) => {
+          if (m instanceof HTMLVideoElement && m.paused) {
+            m.play().catch(e => console.error("Video play failed:", e));
+          }
+        });
+
         const startTime = performance.now();
         function frame(time: number) {
+          if (!isAnimatingRef.current) return;
           ctx.clearRect(0, 0, W, H);
 
           // Draw each media into its TV bounding box
@@ -229,27 +250,66 @@ export default function Hero({ content }: HeroProps) {
           // Draw the processed TV frame on top (green holes are transparent)
           ctx.drawImage(processedBitmap, 0, 0);
 
-          animId = requestAnimationFrame(frame);
+          if (isAnimatingRef.current) {
+            animationIdRef.current = requestAnimationFrame(frame);
+          }
         }
-        animId = requestAnimationFrame(frame);
-      }
+        animationIdRef.current = requestAnimationFrame(frame);
+      };
+
+      stopAnimation = () => {
+        if (!isAnimatingRef.current) return;
+        isAnimatingRef.current = false;
+        if (animationIdRef.current !== null) {
+          cancelAnimationFrame(animationIdRef.current);
+          animationIdRef.current = null;
+        }
+        mediaElements.forEach((m) => {
+          if (m instanceof HTMLVideoElement) {
+            m.pause();
+          }
+        });
+      };
     };
     img.src = "/images/home/retro-tvs.png";
 
+    // --- Step 4: Intersection Observer for visibility tracking ---
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        isVisibleRef.current = entry.isIntersecting;
+        if (entry.isIntersecting) {
+          startAnimation();
+        } else {
+          stopAnimation();
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    if (sectionRef.current) {
+      observer.observe(sectionRef.current);
+    }
+
     // --- Cleanup on unmount ---
     return () => {
-      cancelAnimationFrame(animId);
+      observer.disconnect();
+      if (animationIdRef.current !== null) {
+        cancelAnimationFrame(animationIdRef.current);
+      }
       mediaElements.forEach((m) => {
         if (m instanceof HTMLVideoElement) {
           m.pause();
           m.src = "";
         }
       });
+      animationIdRef.current = null;
+      isAnimatingRef.current = false;
+      isVisibleRef.current = false;
     };
   }, []);
 
   return (
-    <section className="relative min-h-screen flex items-center pt-20 overflow-hidden bg-[var(--bg)] gradient-hero">
+    <section ref={sectionRef} className="relative min-h-screen flex items-center pt-20 overflow-hidden bg-[var(--bg)] gradient-hero">
       <GrainBlobs variant="slate" intensity={0.08} className="opacity-40" />
       <div className="w-full z-10">
         <div className="grid grid-cols-1 lg:grid-cols-2 items-center">
@@ -257,9 +317,10 @@ export default function Hero({ content }: HeroProps) {
           <div className="order-2 lg:order-1 px-6 md:px-12 lg:pl-16 xl:pl-24 lg:pr-8">
             <FadeIn>
               <div className="flex flex-col items-start leading-[1.1] tracking-[-0.03em] text-text mb-8">
-                {/* Line 1: Static Prefix */}
+                {/* Line 1 & 2: Static Prefix & Script */}
                 <div className="text-[clamp(3rem,5vw,5.5rem)] font-editorial font-bold text-[var(--text)]">
-                  <span>{content.headlinePrefix}{content.headlineScript}</span>
+                  <span className="block">{content.headlinePrefix}</span>
+                  <span className="block">{content.headlineScript}</span>
                 </div>
                 
                 {/* Line 2: [Animated Words] */}

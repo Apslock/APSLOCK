@@ -200,6 +200,7 @@ html {
   /* NOTE: scroll-behavior: smooth removed — conflicts with GSAP ScrollTrigger scrub */
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
+  scrollbar-gutter: stable;
 }
 
 body {
