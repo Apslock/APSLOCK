@@ -13,10 +13,10 @@ interface AnimatedCapabilitiesProps {
 }
 
 const capabilityImages = [
-  "/images/capabilities/brand-identity.png",
-  "/images/capabilities/growth-marketing.png",
-  "/images/capabilities/digital-platforms.png",
-  "/images/capabilities/search-visibility.png",
+  "/images/capabilities/brand-identity.webp",
+  "/images/capabilities/growth-marketing.webp",
+  "/images/capabilities/digital-platforms.webp",
+  "/images/capabilities/search-visibility.webp",
 ]
 
 
@@ -386,7 +386,6 @@ export default function AnimatedCapabilities({ items }: AnimatedCapabilitiesProp
                   fill
                   sizes="(max-width: 1280px) 35vw, 500px"
                   className="object-cover transition-transform duration-700 group-hover:scale-105"
-                  priority={activeIndex === 0}
                 />
                 
                 {/* Bottom gradient overlay — moves WITH the image */}
