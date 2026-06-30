@@ -1,7 +1,7 @@
 "use client";
 
 import * as THREE from 'three'
-import { useEffect, useRef, Suspense, useMemo } from 'react'
+import { useEffect, useRef, Suspense, useMemo, useState } from 'react'
 import { useTexture } from '@react-three/drei'
 import { useFrame, Canvas } from '@react-three/fiber'
 import { sphereFragmentShader, sphereVertexShader } from './shaders/sphereShader'
@@ -193,6 +193,28 @@ function HeroScene() {
 
 export default function Hero() {
   const containerRef = useRef<HTMLDivElement>(null);
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        setIsVisible(entry.isIntersecting);
+      },
+      { threshold: 0.1 }
+    );
+
+    const el = containerRef.current;
+    if (el) {
+      observer.observe(el);
+    }
+
+    return () => {
+      if (el) {
+        observer.unobserve(el);
+      }
+      observer.disconnect();
+    };
+  }, []);
 
   return (
     <div
@@ -205,6 +227,7 @@ export default function Hero() {
         camera={{ position: [0, 0, 5], near: 0.1, far: 30, fov: 75 }}
         gl={{ powerPreference: "high-performance", antialias: true, stencil: false, alpha: true }}
         shadows
+        frameloop={isVisible ? "always" : "never"}
       >
         <Suspense fallback={null}>
             <group scale={1.35} position={[-2.8, 0.8, 0]}>
