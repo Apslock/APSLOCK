@@ -3,7 +3,6 @@ import FadeIn from "@/components/shared/FadeIn";
 import { HighlightText } from "@/components/ui/HighlightText";
 import ValuesSection from "@/components/about/ValuesSection";
 import WorkProcess from "@/components/about/WorkProcess";
-import TeamSection from "@/components/about/TeamSection";
 
 import BigCTA from "@/components/shared/BigCTA";
 import GrainBlobs from "@/components/shared/GrainBlobs";
@@ -12,7 +11,7 @@ import { workProcess } from "@/lib/data";
 export const metadata: Metadata = {
   title: "About — APSLOCK",
   description:
-    "Meet the team behind APSLOCK. We are a focused, senior-led studio designing and engineering digital platforms built to last. Learn our values, process, and how we partner with brands.",
+    "APSLOCK is a focused, senior-led studio designing and engineering digital platforms built to last. Learn our values, process, and how we partner with brands.",
   alternates: {
     canonical: "https://apslock.com/about",
   },
@@ -49,9 +48,6 @@ export default function AboutPage() {
 
       {/* Work Process */}
       <div className="relative z-10"><WorkProcess process={workProcess} /></div>
-
-      {/* Team */}
-      <div className="relative z-10"><TeamSection /></div>
 
       {/* CTA */}
       <div className="relative z-10"><BigCTA /></div>
