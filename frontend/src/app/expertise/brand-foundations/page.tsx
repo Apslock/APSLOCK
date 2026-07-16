@@ -9,7 +9,7 @@ import { MarketsWeShape } from "@/components/expertise/brand-foundations/Markets
 import CTA from "@/components/CTA";
 import GrainBlobs from "@/components/shared/GrainBlobs";
 import { workAreas, brandTools, faqs } from "./data";
-import { motion, useTransform, useSpring, useScroll, useMotionValue, MotionValue } from "framer-motion";
+import { motion, useSpring, useScroll, useMotionValue } from "framer-motion";
 
 const brandMarkets = [
   {
@@ -51,14 +51,12 @@ import { ExpertiseHeroCard } from "@/components/expertise/shared/HeroCards";
 
 
 export default function BrandFoundationsPage() {
-  const [isLoaded, setIsLoaded] = useState(false);
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
   const { scrollY } = useScroll();
   const smoothY = useSpring(scrollY, { damping: 50, stiffness: 120, mass: 0.6 });
 
   useEffect(() => {
-    setIsLoaded(true);
     const handleMouseMove = (e: MouseEvent) => {
       const { innerWidth, innerHeight } = window;
       mouseX.set((e.clientX / innerWidth - 0.5) * 2);
@@ -104,45 +102,48 @@ export default function BrandFoundationsPage() {
 
   // Load custom designer state configuration from localStorage on mount
   useEffect(() => {
-    try {
-      const getStored = (key: string, fallback: any) => {
-        const item = localStorage.getItem(key);
-        return item ? JSON.parse(item) : fallback;
-      };
+    const timer = setTimeout(() => {
+      try {
+        const getStored = <T,>(key: string, fallback: T): T => {
+          const item = localStorage.getItem(key);
+          return item ? JSON.parse(item) : fallback;
+        };
 
-      setHeadline(localStorage.getItem("headline") || "The work that makes everything after easier.");
-      setHeadlineSize(getStored("headlineSize", 4.8));
-      setHeadlineFont(localStorage.getItem("headlineFont") || "font-script");
-      setHeadlineColor(localStorage.getItem("headlineColor") || "#0D0D0D");
-      setHeadlineWidth(getStored("headlineWidth", 720));
+        setHeadline(localStorage.getItem("headline") || "The work that makes everything after easier.");
+        setHeadlineSize(getStored("headlineSize", 4.8));
+        setHeadlineFont(localStorage.getItem("headlineFont") || "font-script");
+        setHeadlineColor(localStorage.getItem("headlineColor") || "#0D0D0D");
+        setHeadlineWidth(getStored("headlineWidth", 720));
 
-      setEyebrow(localStorage.getItem("eyebrow") || "Brand Foundations");
-      setEyebrowSize(getStored("eyebrowSize", 3.5));
-      setEyebrowFont(localStorage.getItem("eyebrowFont") || "font-display");
-      setEyebrowColor(localStorage.getItem("eyebrowColor") || "#0D0D0D");
+        setEyebrow(localStorage.getItem("eyebrow") || "Brand Foundations");
+        setEyebrowSize(getStored("eyebrowSize", 3.5));
+        setEyebrowFont(localStorage.getItem("eyebrowFont") || "font-display");
+        setEyebrowColor(localStorage.getItem("eyebrowColor") || "#0D0D0D");
 
-      setDescription(localStorage.getItem("description") || "Positioning, identity, voice, and the systems that let the rest of the business move.");
-      setDescriptionSize(getStored("descriptionSize", 15));
-      setDescriptionColor(localStorage.getItem("descriptionColor") || "#1A1625");
-      setDescWidth(getStored("descWidth", 380));
+        setDescription(localStorage.getItem("description") || "Positioning, identity, voice, and the systems that let the rest of the business move.");
+        setDescriptionSize(getStored("descriptionSize", 15));
+        setDescriptionColor(localStorage.getItem("descriptionColor") || "#1A1625");
+        setDescWidth(getStored("descWidth", 380));
 
-      setBlobWidth(getStored("blobWidth", 68));
-      setBlobHeight(getStored("blobHeight", 90));
-      setBlobTop(getStored("blobTop", -18));
-      setBlobRight(getStored("blobRight", -16));
-      setBlobBlur(getStored("blobBlur", 60));
-      setBlobOpacity(getStored("blobOpacity", 0.72));
-      setBlobColor(localStorage.getItem("blobColor") || "sage");
-      setCustomBlobColor(localStorage.getItem("customBlobColor") || "#28734B");
+        setBlobWidth(getStored("blobWidth", 68));
+        setBlobHeight(getStored("blobHeight", 90));
+        setBlobTop(getStored("blobTop", -18));
+        setBlobRight(getStored("blobRight", -16));
+        setBlobBlur(getStored("blobBlur", 60));
+        setBlobOpacity(getStored("blobOpacity", 0.72));
+        setBlobColor(localStorage.getItem("blobColor") || "sage");
+        setCustomBlobColor(localStorage.getItem("customBlobColor") || "#28734B");
 
-      setBackOffset(getStored("backOffset", { x: 0, y: 0 }));
-      setEyebrowOffset(getStored("eyebrowOffset", { x: 0, y: 0 }));
-      setHeadlineOffset(getStored("headlineOffset", { x: 0, y: 0 }));
-      setDescOffset(getStored("descOffset", { x: 0, y: 0 }));
-      setBlobOffset(getStored("blobOffset", { x: 0, y: 0 }));
-    } catch (e) {
-      console.warn("Could not load designer state from localStorage", e);
-    }
+        setBackOffset(getStored("backOffset", { x: 0, y: 0 }));
+        setEyebrowOffset(getStored("eyebrowOffset", { x: 0, y: 0 }));
+        setHeadlineOffset(getStored("headlineOffset", { x: 0, y: 0 }));
+        setDescOffset(getStored("descOffset", { x: 0, y: 0 }));
+        setBlobOffset(getStored("blobOffset", { x: 0, y: 0 }));
+      } catch (e) {
+        console.warn("Could not load designer state from localStorage", e);
+      }
+    }, 0);
+    return () => clearTimeout(timer);
   }, []);
 
   // Computed Blob Background

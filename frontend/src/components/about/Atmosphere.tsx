@@ -2,11 +2,20 @@
 
 import React, { useEffect, useRef, useCallback } from "react";
 
-/**
- * Atmosphere — Production-grade particle nebula canvas.
- * Renders a living field of light particles with pointer interaction,
- * star field, film grain, and cinematic vignette.
- */
+interface AtmosphereAPI {
+  setPalette: (name: "default" | "aurora" | "ember" | "cosmic") => void;
+  setOptions: (opts: Record<string, unknown>) => void;
+  triggerRipple: (x: number, y: number) => void;
+  pause: () => void;
+  resume: () => void;
+  destroy: () => void;
+}
+
+declare global {
+  interface Window {
+    Atmosphere?: AtmosphereAPI;
+  }
+}
 
 export default function Atmosphere({
   className = "",
@@ -415,7 +424,7 @@ export default function Atmosphere({
       } catch (err) {
         console.warn("[Atmosphere] draw error — static fallback.", err);
         stopLoop();
-        try { drawStatic(); } catch (_) { /* silent */ }
+        try { drawStatic(); } catch { /* silent */ }
         return;
       }
       s.rafId = requestAnimationFrame(draw);
@@ -496,11 +505,13 @@ export default function Atmosphere({
     }
 
     // Export public API to window if needed
-    (window as any).Atmosphere = {
+    window.Atmosphere = {
       setPalette: (name: 'default'|'aurora'|'ember'|'cosmic') => {
-        if ((PALETTES as any)[name]) COLORS = [...(PALETTES as any)[name]];
+        if (PALETTES[name]) COLORS = [...PALETTES[name]];
       },
-      setOptions: (opts: any) => Object.assign(CFG, opts),
+      setOptions: (opts: Record<string, unknown>) => {
+        Object.assign(CFG, opts);
+      },
       triggerRipple: (x: number, y: number) => {
         if (s.ripples.length >= CFG.MAX_RIPPLES) s.ripples.shift();
         s.ripples.push({ x, y, ts: performance.now() });
@@ -524,9 +535,9 @@ export default function Atmosphere({
       document.removeEventListener("touchend", onPointerLeave);
       document.removeEventListener("touchcancel", onPointerLeave);
       document.removeEventListener("visibilitychange", onVisibilityChange);
-      if ((window as any).Atmosphere) delete (window as any).Atmosphere;
+      if (window.Atmosphere) delete window.Atmosphere;
     };
-  }, [getCount]);
+  }, [getCount, anchorCorner, compact, disableBackgroundEffects, disableScrollFade]);
 
   return (
     <div

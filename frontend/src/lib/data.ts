@@ -453,6 +453,7 @@ export interface BlogPost {
   readTime: string;
   image: ImageAsset;
   variant?: "editorial" | "narrative" | "technical" | "qanda";
+  body?: Record<string, unknown>[];
 }
 
 export const blogPosts: BlogPost[] = [
@@ -1002,13 +1003,10 @@ export interface ContactInfo {
 
 export const contactInfo: ContactInfo = {
   email: "hello@apslock.com",
-  phone: "+1 (404) 555-0192",
+  phone: "+1 770 589 4550",
   location: "Atlanta, GA",
   locationDetail: "Atlanta, GA — serving clients nationwide and worldwide.",
   social: [
     { platform: "LinkedIn", url: "https://linkedin.com/company/apslock", icon: "Linkedin" },
-    { platform: "Twitter", url: "https://twitter.com/apslock", icon: "Twitter" },
-    { platform: "Instagram", url: "https://instagram.com/apslock", icon: "Instagram" },
-    { platform: "Dribbble", url: "https://dribbble.com/apslock", icon: "Dribbble" },
   ],
 };

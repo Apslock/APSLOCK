@@ -41,6 +41,11 @@ export default function ContactForm({ className }: ContactFormProps) {
     date: Date;
     time: string;
   } | null>(null);
+  const [successBooking, setSuccessBooking] = useState<{
+    date: string;
+    time: string;
+    meetingLink: string | null;
+  } | null>(null);
 
   const validate = (): boolean => {
     const newErrors: FormErrors = {};
@@ -69,29 +74,79 @@ export default function ContactForm({ className }: ContactFormProps) {
     setSubmitting(true);
     setSubmitError(null);
 
-    // [BACKEND PENDING] /api/contact — not yet implemented.
-    // Currently shows success without sending any data.
-    // Replace this block with:
-    //   const controller = new AbortController();
-    //   const timeout = setTimeout(() => controller.abort(), 8000);
-    //   try {
-    //     const res = await fetch('/api/contact', {
-    //       method: 'POST',
-    //       headers: { 'Content-Type': 'application/json' },
-    //       body: JSON.stringify(formData),
-    //       signal: controller.signal,
-    //     });
-    //     clearTimeout(timeout);
-    //     if (!res.ok) throw new Error('Failed to submit form');
-    //     setSubmitted(true);
-    //   } catch (err) {
-    //     setSubmitError('Something went wrong. Please try emailing us directly.');
-    //   } finally {
-    //     setSubmitting(false);
-    //   }
-    await new Promise((resolve) => setTimeout(resolve, 1000));
-    setSubmitting(false);
-    setSubmitted(true);
+    const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8002";
+
+    try {
+      // 1. Submit contact lead
+      const contactRes = await fetch(`${API_BASE_URL}/api/contact/`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: formData.name,
+          email: formData.email,
+          company: formData.company,
+          message: formData.message,
+        }),
+      });
+
+      if (!contactRes.ok) {
+        const errorData = await contactRes.json().catch(() => ({}));
+        throw new Error(errorData.error || "Failed to send message. Please try again.");
+      }
+
+      // 2. If a booking slot was selected and confirmed, submit booking
+      if (formData.scheduledDate && formData.scheduledTime) {
+        // Format date: YYYY-MM-DD
+        const year = formData.scheduledDate.getFullYear();
+        const month = String(formData.scheduledDate.getMonth() + 1).padStart(2, "0");
+        const day = String(formData.scheduledDate.getDate()).padStart(2, "0");
+        const formattedDate = `${year}-${month}-${day}`;
+
+        // Format time: "9:00 AM" -> "09:00"
+        const timeParts = formData.scheduledTime.split(" ");
+        const timeVal = timeParts[0];
+        const ampm = timeParts[1];
+        let [hours, minutes] = timeVal.split(":");
+        if (hours === "12") {
+          hours = "00";
+        }
+        if (ampm === "PM") {
+          hours = String(parseInt(hours, 10) + 12);
+        }
+        const formattedTime = `${hours.padStart(2, "0")}:${minutes.padStart(2, "0")}`;
+
+        const bookingRes = await fetch(`${API_BASE_URL}/api/bookings/`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: formData.name,
+            email: formData.email,
+            phone: "",
+            message: formData.message,
+            date: formattedDate,
+            start_time: formattedTime,
+          }),
+        });
+
+        if (!bookingRes.ok) {
+          const errorData = await bookingRes.json().catch(() => ({}));
+          throw new Error(errorData.error || "Contact saved, but booking failed. Please refresh and try booking again.");
+        }
+
+        const bookingResData = await bookingRes.json();
+        setSuccessBooking({
+          date: bookingResData.date,
+          time: bookingResData.time,
+          meetingLink: bookingResData.meeting_link || null,
+        });
+      }
+
+      setSubmitted(true);
+    } catch (err: any) {
+      setSubmitError(err.message || "Something went wrong. Please try again.");
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const handleChange = (
@@ -117,16 +172,40 @@ export default function ContactForm({ className }: ContactFormProps) {
 
   if (submitted) {
     return (
-      <div className={cn("text-center py-16", className)}>
+      <div className={cn("text-center py-12 px-6 bg-surface border border-border rounded-2xl", className)}>
         <div className="w-16 h-16 mx-auto mb-6 flex items-center justify-center rounded-full bg-accent/10">
           <CheckCircle size={32} className="text-accent" />
         </div>
         <h3 className="text-2xl font-display text-text mb-3">
-          Thank you for reaching out
+          Thank you for reaching out!
         </h3>
-        <p className="text-text-muted max-w-md mx-auto">
+        <p className="text-text-muted max-w-md mx-auto mb-6">
           We&apos;ve received your message and will get back to you within one business day.
         </p>
+
+        {successBooking && (
+          <div className="max-w-md mx-auto p-5 bg-black/40 border border-white/5 rounded-xl text-left space-y-3">
+            <h4 className="text-sm font-semibold uppercase tracking-wider text-accent">
+              Consultation Scheduled
+            </h4>
+            <div className="text-sm text-text space-y-1">
+              <p><span className="text-text-muted">Date:</span> {new Date(successBooking.date + "T00:00:00").toLocaleDateString("en-US", { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
+              <p><span className="text-text-muted">Time:</span> {successBooking.time} (IST)</p>
+              {successBooking.meetingLink ? (
+                <p>
+                  <span className="text-text-muted">Google Meet:</span>{" "}
+                  <a href={successBooking.meetingLink} target="_blank" rel="noopener noreferrer" className="text-accent underline hover:text-accent-hover transition-colors">
+                    Join Meeting
+                  </a>
+                </p>
+              ) : (
+                <p className="text-text-muted text-xs italic mt-2">
+                  * A calendar invitation with the Google Meet link has been sent to your email.
+                </p>
+              )}
+            </div>
+          </div>
+        )}
       </div>
     );
   }

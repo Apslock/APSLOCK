@@ -290,9 +290,11 @@ export default function ExpertiseHero() {
   useEffect(() => {
     const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
     if (prefersReduced) {
-      setCurtainDone(true);
-      setIsLoaded(true);
-      return;
+      const timer = setTimeout(() => {
+        setCurtainDone(true);
+        setIsLoaded(true);
+      }, 0);
+      return () => clearTimeout(timer);
     }
 
     // FIX 7: new lenis package with lerp instead of duration
@@ -553,7 +555,7 @@ export default function ExpertiseHero() {
                   transition={{ duration: 0.72, ease: EASE.text, delay: 1.05 }}
                   className="text-[12px] leading-[1.85] tracking-[0.015em] text-foreground/40 font-normal"
                 >
-                  Visual craft isn't a service we offer.
+                  Visual craft isn&apos;t a service we offer.
                 </motion.p>
               </div>
               <div className="overflow-hidden mb-1">
@@ -567,7 +569,7 @@ export default function ExpertiseHero() {
                   transition={{ duration: 0.72, ease: EASE.text, delay: 1.18 }}
                   className="text-[12px] leading-[1.85] tracking-[0.015em] text-foreground/40 font-normal"
                 >
-                  It's a standard we hold — quietly, consistently,
+                  It&apos;s a standard we hold — quietly, consistently,
                 </motion.p>
               </div>
               <div className="overflow-hidden">

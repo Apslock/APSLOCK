@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, Variants } from "framer-motion";
 
 export default function Preloader() {
   const [show, setShow] = useState(true);
@@ -9,9 +9,9 @@ export default function Preloader() {
   useEffect(() => {
     const hasPreloaded = sessionStorage.getItem("apslock-preloaded");
     if (hasPreloaded === "true") {
-      setShow(false);
+      const timer = setTimeout(() => setShow(false), 0);
       document.body.style.overflow = "";
-      return;
+      return () => clearTimeout(timer);
     }
 
     document.body.style.overflow = "hidden";
@@ -34,7 +34,7 @@ export default function Preloader() {
   const logoLetters = ["A", "P", "S", "L", "O", "C", "K"];
 
   // Animation variants
-  const containerVariants = {
+  const containerVariants: Variants = {
     initial: {
       y: 0,
     },
@@ -42,13 +42,13 @@ export default function Preloader() {
       y: "-100%",
       transition: {
         duration: 0.8,
-        ease: [0.76, 0, 0.24, 1] as any, // Custom cinematic cubic-bezier
+        ease: [0.76, 0, 0.24, 1],
         when: "afterChildren",
       },
     },
   };
 
-  const letterVariants = {
+  const letterVariants: Variants = {
     initial: {
       y: 8,
       opacity: 0,
@@ -59,12 +59,12 @@ export default function Preloader() {
       transition: {
         duration: 0.55,
         delay: i * 0.05 + 0.15,
-        ease: [0.215, 0.61, 0.355, 1] as any,
+        ease: [0.215, 0.61, 0.355, 1],
       },
     }),
   };
 
-  const textVariants = {
+  const textVariants: Variants = {
     initial: {
       opacity: 0,
       y: 5,
@@ -75,7 +75,7 @@ export default function Preloader() {
       transition: {
         duration: 0.4,
         delay: 0.65,
-        ease: "easeOut" as any,
+        ease: "easeOut",
       },
     },
   };

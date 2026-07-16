@@ -47,11 +47,32 @@ export default function ValuesSection() {
   const pathLength = useTransform(smoothProgress, [0, 1], [0, 1]);
 
   // Per-item: reveal slightly after brush passes
-  const reveals = triggers.map((start) => ({
-    opacity: useTransform(smoothProgress, [start, start + 0.14], [0, 1]),
-    y:       useTransform(smoothProgress, [start, start + 0.14], [20, 0]),
-    blur:    useTransform(smoothProgress, [start, start + 0.14], [6, 0]),
-  }));
+  const opacity0 = useTransform(smoothProgress, [triggers[0], triggers[0] + 0.14], [0, 1]);
+  const y0 = useTransform(smoothProgress, [triggers[0], triggers[0] + 0.14], [20, 0]);
+  const blur0 = useTransform(smoothProgress, [triggers[0], triggers[0] + 0.14], [6, 0]);
+  const filter0 = useTransform(blur0, (v) => `blur(${v}px)`);
+
+  const opacity1 = useTransform(smoothProgress, [triggers[1], triggers[1] + 0.14], [0, 1]);
+  const y1 = useTransform(smoothProgress, [triggers[1], triggers[1] + 0.14], [20, 0]);
+  const blur1 = useTransform(smoothProgress, [triggers[1], triggers[1] + 0.14], [6, 0]);
+  const filter1 = useTransform(blur1, (v) => `blur(${v}px)`);
+
+  const opacity2 = useTransform(smoothProgress, [triggers[2], triggers[2] + 0.14], [0, 1]);
+  const y2 = useTransform(smoothProgress, [triggers[2], triggers[2] + 0.14], [20, 0]);
+  const blur2 = useTransform(smoothProgress, [triggers[2], triggers[2] + 0.14], [6, 0]);
+  const filter2 = useTransform(blur2, (v) => `blur(${v}px)`);
+
+  const opacity3 = useTransform(smoothProgress, [triggers[3], triggers[3] + 0.14], [0, 1]);
+  const y3 = useTransform(smoothProgress, [triggers[3], triggers[3] + 0.14], [20, 0]);
+  const blur3 = useTransform(smoothProgress, [triggers[3], triggers[3] + 0.14], [6, 0]);
+  const filter3 = useTransform(blur3, (v) => `blur(${v}px)`);
+
+  const reveals = [
+    { opacity: opacity0, y: y0, filter: filter0 },
+    { opacity: opacity1, y: y1, filter: filter1 },
+    { opacity: opacity2, y: y2, filter: filter2 },
+    { opacity: opacity3, y: y3, filter: filter3 },
+  ];
 
   // Path flows through OPPOSITE side from each content block:
   // Origin (left)     → path stays right  (x ~750)
@@ -152,7 +173,7 @@ export default function ValuesSection() {
                   style={{
                     opacity: reveals[i].opacity,
                     y:       reveals[i].y,
-                    filter:  useTransform(reveals[i].blur, (v) => `blur(${v}px)`),
+                    filter:  reveals[i].filter,
                   }}
                 >
                   <h3 className="text-2xl md:text-3xl font-semibold text-text mb-3 tracking-tight">

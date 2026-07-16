@@ -195,7 +195,7 @@ function QandAContent({ sections }: { sections: Section[] }) {
 // VARIANT 3 — NARRATIVE  (Brand Trust / Strategy blog)
 // Personal, flowing, no rigid structure — like a letter
 // ══════════════════════════════════════════════════════════
-function NarrativeContent({ sections, post }: { sections: Section[]; post: BlogPost | any }) {
+function NarrativeContent({ sections, post }: { sections: Section[]; post: BlogPost }) {
   return (
     <div className="max-w-[660px] mx-auto">
       {/* Opening letter */}
@@ -380,8 +380,8 @@ const portableTextComponents: PortableTextComponents = {
 // MAIN COMPONENT
 // ══════════════════════════════════════════════════════════
 interface BlogPostContentProps {
-  post: BlogPost | any;
-  relatedPosts: BlogPost[] | any[];
+  post: BlogPost;
+  relatedPosts: BlogPost[];
 }
 
 export default function BlogPostContent({ post, relatedPosts }: BlogPostContentProps) {

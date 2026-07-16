@@ -88,45 +88,48 @@ export default function GrowthGoToMarketPage() {
 
   // Load custom designer state configuration from localStorage on mount
   useEffect(() => {
-    try {
-      const getStored = (key: string, fallback: any) => {
-        const item = localStorage.getItem(`gtm_${key}`);
-        return item ? JSON.parse(item) : fallback;
-      };
+    const timer = setTimeout(() => {
+      try {
+        const getStored = <T,>(key: string, fallback: T): T => {
+          const item = localStorage.getItem(`gtm_${key}`);
+          return item ? JSON.parse(item) : fallback;
+        };
 
-      setHeadline(localStorage.getItem("gtm_headline") || "Pipeline that holds, quarter after quarter.");
-      setHeadlineSize(getStored("headlineSize", 4.8));
-      setHeadlineFont(localStorage.getItem("gtm_headlineFont") || "font-script");
-      setHeadlineColor(localStorage.getItem("gtm_headlineColor") || "#0D0D0D");
-      setHeadlineWidth(getStored("headlineWidth", 720));
+        setHeadline(localStorage.getItem("gtm_headline") || "Pipeline that holds, quarter after quarter.");
+        setHeadlineSize(getStored("headlineSize", 4.8));
+        setHeadlineFont(localStorage.getItem("gtm_headlineFont") || "font-script");
+        setHeadlineColor(localStorage.getItem("gtm_headlineColor") || "#0D0D0D");
+        setHeadlineWidth(getStored("headlineWidth", 720));
 
-      setEyebrow(localStorage.getItem("gtm_eyebrow") || "Growth & Go-To-Market");
-      setEyebrowSize(getStored("eyebrowSize", 1.75));
-      setEyebrowFont(localStorage.getItem("gtm_eyebrowFont") || "font-display");
-      setEyebrowColor(localStorage.getItem("gtm_eyebrowColor") || "#0D0D0D");
+        setEyebrow(localStorage.getItem("gtm_eyebrow") || "Growth & Go-To-Market");
+        setEyebrowSize(getStored("eyebrowSize", 1.75));
+        setEyebrowFont(localStorage.getItem("gtm_eyebrowFont") || "font-display");
+        setEyebrowColor(localStorage.getItem("gtm_eyebrowColor") || "#0D0D0D");
 
-      setDescription(localStorage.getItem("gtm_description") || "Demand programs, lifecycle, paid media, and the GTM motion behind sustained revenue. We turn market ambition into commercial momentum — sharper positioning, right-fit channels, and execution that compounds, so growth stops depending on heroics and starts working as a system.");
-      setDescriptionSize(getStored("descriptionSize", 15));
-      setDescriptionColor(localStorage.getItem("gtm_descriptionColor") || "#1A1625");
-      setDescWidth(getStored("descWidth", 520));
+        setDescription(localStorage.getItem("gtm_description") || "Demand programs, lifecycle, paid media, and the GTM motion behind sustained revenue. We turn market ambition into commercial momentum — sharper positioning, right-fit channels, and execution that compounds, so growth stops depending on heroics and starts working as a system.");
+        setDescriptionSize(getStored("descriptionSize", 15));
+        setDescriptionColor(localStorage.getItem("gtm_descriptionColor") || "#1A1625");
+        setDescWidth(getStored("descWidth", 520));
 
-      setBlobWidth(getStored("blobWidth", 68));
-      setBlobHeight(getStored("blobHeight", 90));
-      setBlobTop(getStored("blobTop", -18));
-      setBlobRight(getStored("blobRight", -16));
-      setBlobBlur(getStored("blobBlur", 60));
-      setBlobOpacity(getStored("blobOpacity", 0.72));
-      setBlobColor(localStorage.getItem("gtm_blobColor") || "amber");
-      setCustomBlobColor(localStorage.getItem("gtm_customBlobColor") || "#b85c38");
+        setBlobWidth(getStored("blobWidth", 68));
+        setBlobHeight(getStored("blobHeight", 90));
+        setBlobTop(getStored("blobTop", -18));
+        setBlobRight(getStored("blobRight", -16));
+        setBlobBlur(getStored("blobBlur", 60));
+        setBlobOpacity(getStored("blobOpacity", 0.72));
+        setBlobColor(localStorage.getItem("gtm_blobColor") || "amber");
+        setCustomBlobColor(localStorage.getItem("gtm_customBlobColor") || "#b85c38");
 
-      setBackOffset(getStored("backOffset", { x: 0, y: 0 }));
-      setEyebrowOffset(getStored("eyebrowOffset", { x: 0, y: 0 }));
-      setHeadlineOffset(getStored("headlineOffset", { x: 0, y: 0 }));
-      setDescOffset(getStored("descOffset", { x: 0, y: 0 }));
-      setBlobOffset(getStored("blobOffset", { x: 0, y: 0 }));
-    } catch (e) {
-      console.warn("Could not load designer state from localStorage", e);
-    }
+        setBackOffset(getStored("backOffset", { x: 0, y: 0 }));
+        setEyebrowOffset(getStored("eyebrowOffset", { x: 0, y: 0 }));
+        setHeadlineOffset(getStored("headlineOffset", { x: 0, y: 0 }));
+        setDescOffset(getStored("descOffset", { x: 0, y: 0 }));
+        setBlobOffset(getStored("blobOffset", { x: 0, y: 0 }));
+      } catch (e) {
+        console.warn("Could not load designer state from localStorage", e);
+      }
+    }, 0);
+    return () => clearTimeout(timer);
   }, []);
 
   // Computed Blob Background

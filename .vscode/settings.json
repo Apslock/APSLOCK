@@ -1,4 +1,7 @@
 {
   "css.lint.unknownAtRules": "ignore",
-  "workbench.browser.openLocalhostLinks": false
+  "workbench.browser.openLocalhostLinks": false,
+  "eslint.workingDirectories": [
+    "./frontend"
+  ]
 }

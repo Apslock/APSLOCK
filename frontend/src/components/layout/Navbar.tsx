@@ -127,7 +127,7 @@ export default function Navbar({ links, siteName }: NavbarProps) {
             href="/contact"
             className="inline-flex items-center gap-1.5 px-4 py-2 text-[12px] font-bold tracking-wide bg-accent text-bg rounded-full active:scale-95 transition-all duration-300 shadow-sm"
           >
-            Let's talk <span className="text-sm leading-none">↗</span>
+            Let&apos;s talk <span className="text-sm leading-none">↗</span>
           </Link>
         </div>
 
@@ -310,7 +310,7 @@ export default function Navbar({ links, siteName }: NavbarProps) {
               aria-current={isActive("/contact") ? "page" : undefined}
               className="inline-flex items-center gap-2 px-6 py-3 text-[14px] font-bold tracking-wide bg-accent text-bg rounded-full hover:scale-105 active:scale-95 transition-all duration-300 shadow-[0_4px_14px_rgba(0,0,0,0.1)] hover:shadow-[0_6px_20px_rgba(0,0,0,0.15)]"
             >
-              Let's talk <span className="text-lg leading-none">↗</span>
+              Let&apos;s talk <span className="text-lg leading-none">↗</span>
             </Link>
           </div>
         </nav>

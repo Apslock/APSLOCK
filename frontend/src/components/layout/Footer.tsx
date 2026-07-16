@@ -42,7 +42,14 @@ function LiveClock() {
   const [time, setTime] = useState<string | null>(null);
   useEffect(() => {
     const fmt = () => new Date().toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: false, timeZone: "America/New_York" });
-    setTime(fmt()); const id = setInterval(() => setTime(fmt()), 1000); return () => clearInterval(id);
+    const timer = setTimeout(() => {
+      setTime(fmt());
+    }, 0);
+    const id = setInterval(() => setTime(fmt()), 1000);
+    return () => {
+      clearTimeout(timer);
+      clearInterval(id);
+    };
   }, []);
   return <span className="font-mono tabular-nums" style={{ color: "rgba(255,255,255,0.45)" }}>{time ?? "—"}</span>;
 }
@@ -66,7 +73,7 @@ function StatusDot() {
    ═══════════════════════════════════════════════════ */
 export default function Footer({ links, contactInfo, siteName }: FooterProps) {
   const pathname = usePathname();
-  const [currentYear, setCurrentYear] = useState<number>(2024);
+  const [currentYear, setCurrentYear] = useState<number>(() => new Date().getFullYear());
   const footerRef = useRef<HTMLElement>(null);
   const blob1Ref = useRef<HTMLDivElement>(null);
   const blob2Ref = useRef<HTMLDivElement>(null);
@@ -74,8 +81,45 @@ export default function Footer({ links, contactInfo, siteName }: FooterProps) {
   const [heroVisible, setHeroVisible] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
+  // Newsletter states
+  const [newsletterEmail, setNewsletterEmail] = useState("");
+  const [newsletterSubmitting, setNewsletterSubmitting] = useState(false);
+  const [newsletterSubscribed, setNewsletterSubscribed] = useState(false);
+  const [newsletterError, setNewsletterError] = useState<string | null>(null);
+
+  const handleNewsletterSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!newsletterEmail.trim()) return;
+
+    setNewsletterSubmitting(true);
+    setNewsletterError(null);
+
+    const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8002";
+
+    try {
+      const res = await fetch(`${API_BASE_URL}/api/newsletter/`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ email: newsletterEmail.trim() }),
+      });
+
+      const data = await res.json().catch(() => ({}));
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to subscribe. Please try again.");
+      }
+
+      setNewsletterSubscribed(true);
+      setNewsletterEmail("");
+    } catch (err: any) {
+      setNewsletterError(err.message || "Failed to subscribe.");
+    } finally {
+      setNewsletterSubmitting(false);
+    }
+  };
+
   useEffect(() => {
-    setCurrentYear(new Date().getFullYear());
     const timer = setTimeout(() => setHeroVisible(true), 100);
     
     const checkMobile = () => setIsMobile(window.innerWidth < 1024);
@@ -314,7 +358,6 @@ export default function Footer({ links, contactInfo, siteName }: FooterProps) {
                   </div>
                 </div>
                 
-                <div className="mt-1"><StatusDot /></div>
               </div>
             </div>
             <div className="flex flex-col items-start lg:items-end justify-between gap-12 lg:gap-0 w-full lg:w-auto self-stretch">
@@ -322,25 +365,38 @@ export default function Footer({ links, contactInfo, siteName }: FooterProps) {
               <div className="w-full max-w-xs">
                 <p className="text-[0.6rem] font-mono uppercase tracking-[0.25em] mb-3" style={{ color: "rgba(255,255,255,0.25)" }}>Newsletter</p>
                 <p className="text-xs mb-3" style={{ color: "rgba(255,255,255,0.4)" }}>Useful thoughts on brand, design, and growth — written for teams building something meaningful.</p>
-                <form onSubmit={(e) => e.preventDefault()} className="flex items-center gap-0 rounded-full overflow-hidden" style={{ border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.04)" }}>
+                <form onSubmit={handleNewsletterSubmit} className="flex items-center gap-0 rounded-full overflow-hidden" style={{ border: "1px solid rgba(255,255,255,0.1)", background: "rgba(255,255,255,0.04)" }}>
                   <input
                     type="email"
-                    placeholder="your@email.com"
+                    placeholder={newsletterSubscribed ? "Thank you!" : "your@email.com"}
                     aria-label="Email for newsletter"
-                    className="flex-1 bg-transparent px-4 py-2.5 text-xs outline-none placeholder:text-white/20"
+                    value={newsletterEmail}
+                    onChange={(e) => setNewsletterEmail(e.target.value)}
+                    disabled={newsletterSubmitting || newsletterSubscribed}
+                    className="flex-1 bg-transparent px-4 py-2.5 text-xs outline-none placeholder:text-white/20 disabled:opacity-50"
                     style={{ color: "rgba(255,255,255,0.7)" }}
+                    required
                   />
                   <button
                     type="submit"
                     aria-label="Subscribe"
-                    className="px-4 py-2.5 transition-colors duration-200"
+                    disabled={newsletterSubmitting || newsletterSubscribed}
+                    className="px-4 py-2.5 transition-colors duration-200 disabled:opacity-50"
                     style={{ color: "rgba(255,255,255,0.4)" }}
-                    onMouseEnter={e => { e.currentTarget.style.color = "rgba(255,255,255,0.9)"; }}
-                    onMouseLeave={e => { e.currentTarget.style.color = "rgba(255,255,255,0.4)"; }}
+                    onMouseEnter={e => { if (!newsletterSubscribed && !newsletterSubmitting) e.currentTarget.style.color = "rgba(255,255,255,0.9)"; }}
+                    onMouseLeave={e => { if (!newsletterSubscribed && !newsletterSubmitting) e.currentTarget.style.color = "rgba(255,255,255,0.4)"; }}
                   >
-                    <span className="text-xs font-medium tracking-wide">Subscribe</span>
+                    <span className="text-xs font-medium tracking-wide">
+                      {newsletterSubmitting ? "Subscribing..." : newsletterSubscribed ? "Subscribed!" : "Subscribe"}
+                    </span>
                   </button>
                 </form>
+                {newsletterError && (
+                  <p className="text-[10px] text-red-400 mt-1.5 ml-3 font-mono">{newsletterError}</p>
+                )}
+                {newsletterSubscribed && (
+                  <p className="text-[10px] text-emerald-400 mt-1.5 ml-3 font-mono">Welcome aboard! Check your inbox.</p>
+                )}
               </div>
               <div className="flex flex-col items-start lg:items-end gap-5">
                 <p className="text-xs font-mono" style={{ color: "rgba(255,255,255,0.22)" }}>© {currentYear} {siteName}. All rights reserved.</p>

@@ -4,10 +4,16 @@ import * as THREE from 'three'
 import { useEffect, useRef, Suspense, useMemo, useState } from 'react'
 import { useTexture } from '@react-three/drei'
 import { useFrame, Canvas } from '@react-three/fiber'
-import { sphereFragmentShader, sphereVertexShader } from './shaders/sphereShader'
 import { heroDepthFragmentShader, heroFragmentShader, heroVertexShader } from './shaders/heroShader'
 
 const INSTANCES_COUNT = 3000;
+
+interface OrbitConfig {
+  speed: number;
+  phase: number;
+  plane: string;
+  dir: number;
+}
 
 function HeroScene() {
     const groupRef = useRef<THREE.Group>(null);
@@ -46,7 +52,7 @@ function HeroScene() {
         refGeometry.computeBoundingBox();
 
         const geo = new THREE.InstancedBufferGeometry();
-        for (let id in refGeometry.attributes) {
+        for (const id in refGeometry.attributes) {
             geo.setAttribute(id, refGeometry.attributes[id]);
         }
         geo.setIndex(refGeometry.index);
@@ -110,7 +116,7 @@ function HeroScene() {
         ];
         const radius = 1.9;
         
-        function orbitPosition(t: number, config: any) {
+        function orbitPosition(t: number, config: OrbitConfig) {
             const angle = config.dir * config.speed * t + config.phase;
             if (config.plane === 'xy') return [Math.cos(angle) * radius, Math.sin(angle) * radius, 0] as [number, number, number];
             if (config.plane === 'xz') return [Math.cos(angle) * radius, 0, Math.sin(angle) * radius] as [number, number, number];

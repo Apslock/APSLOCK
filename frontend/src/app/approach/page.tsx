@@ -74,7 +74,7 @@ export default function ApproachPage() {
               </Reveal>
               <Reveal delay={150} duration={800} distance={20}>
                 <p className="mt-6 text-lg text-[#6B5A7A] max-w-md leading-relaxed">
-                  We don't rely on templates or pre-packaged playbooks. Every system is built to solve the specific operational and growth constraints of your business.
+                  We don&apos;t rely on templates or pre-packaged playbooks. Every system is built to solve the specific operational and growth constraints of your business.
                 </p>
               </Reveal>
             </div>
